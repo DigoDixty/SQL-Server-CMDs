@@ -14,7 +14,7 @@ d(d) AS
 src AS
 (
   SELECT
-    TheDate         = CONVERT(date, d),
+    TheDate         = CONVERT(date,       d),
     TheDay          = DATEPART(DAY,       d),
     TheDayName      = DATENAME(WEEKDAY,   d),
     TheWeek         = DATEPART(WEEK,      d),
@@ -29,7 +29,7 @@ src AS
     TheDayOfYear    = DATEPART(DAYOFYEAR, d)
   FROM d
 )
-SELECT *, TheDate AS last_10u_day 
+SELECT * 
 INTO CALENDAR
 FROM src
 ORDER BY TheDate
@@ -38,3 +38,27 @@ OPTION (MAXRECURSION 0)
 
 SELECT MIN(TheDate), MAX(TheDate), count(1) FROM CALENDAR;
 -- 11 rows
+
+ALTER TABLE CALENDAR
+ADD last_10u_day date;
+
+ALTER TABLE CALENDAR
+ADD is_holiday BIT;
+
+ALTER TABLE CALENDAR
+ADD desc_holiday varchar(100);
+
+UPDATE CALENDAR 
+SET is_holiday = dbo.fn_IsHoliday(TheDate)
+;
+
+UPDATE CALENDAR 
+SET desc_holiday = dbo.fn_IsHoliday_desc(TheDate)
+;
+
+UPDATE CALENDAR 
+SET last_10u_day = dbo.fn_10days_u(TheDate)
+;
+
+
+
